@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "al"
+version = "0.1.0"
+description = "A streamlined CLI tool for managing aliases on Linux systems, simplifying the creation, deletion, and management of command shortcuts."
+authors = ["Vaadeendra  <42719383+Vaadee@users.noreply.github.com>"]
+license = "GNU GENERAL PUBLIC LICENSE"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pytest = "^8.1.1"
+typer = "^0.9.0"
+rich = "^13.7.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
