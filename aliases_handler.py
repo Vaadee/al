@@ -1,3 +1,5 @@
+#!/Users/vaadeendra/petp/al/.venv/bin/python3.12
+
 """Python script to handle aliases"""
 
 import re

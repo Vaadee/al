@@ -11,6 +11,8 @@ python = "^3.11"
 pytest = "^8.1.1"
 typer = "^0.9.0"
 rich = "^13.7.1"
+tinydb = "^4.8.0"
+pydantic = "^2.6.4"
 
 
 [build-system]

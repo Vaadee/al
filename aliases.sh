@@ -13,7 +13,7 @@ alias jmt="/home/vaadeendra/apps/apache-jmeter-5.6.3/bin/jmeter"
 alias nsb="/home/vaadeendra/apps/nosqlbooster4mongo-8.1.6.AppImage"
 
 #[main]
-alias o.bashrc="nano ~/.bashrc"
+alias o.zshrc="nano ~/.zshrc"
 alias q="exit"
-alias s.bashrc="source ~/.bashrc"
+alias s.zshrc="source ~/.zshrc"
 
