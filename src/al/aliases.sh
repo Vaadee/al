@@ -16,4 +16,3 @@ alias nsb="/home/vaadeendra/apps/nosqlbooster4mongo-8.1.6.AppImage"
 alias o.zshrc="nano ~/.zshrc"
 alias q="exit"
 alias s.zshrc="source ~/.zshrc"
-
