@@ -1,15 +1,20 @@
-#!/home/vaadeendra/scripts/aliases/aliases_venv/bin/python3
+#!/Users/vaadeendra/petp/al/.venv/bin/python3.12
+
 """Python script to handle aliases"""
 
 import re
 import json
 import subprocess
 import sys
+import os
 
 import typer
 from typing_extensions import Annotated, Optional
 from rich.table import Table
 from rich.console import Console
+
+# alias file path
+alias_file_path = r"/Users/vaadeendra/petp/al/aliases.sh"
 
 console = Console()
 
@@ -20,7 +25,7 @@ edit_commands = typer.Typer()
 app.add_typer(edit_commands, name="edit", help="Edit the aliases.")
 
 
-def convert_script_to_json(file_path):
+def convert_script_to_json(alias_file_path):
     """Convert the script to JSON."""
     # Define a regular expression pattern to match the sections
     section_pattern = r"\#\[\s*([^\]]+)\s*\]((?:\n[^\#]*)+)"
@@ -28,7 +33,7 @@ def convert_script_to_json(file_path):
 
     try:
         # Read the script file
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(alias_file_path, "r", encoding="utf-8") as file:
             script_content = file.read()
 
         # Initialize an empty dictionary to store the JSON data
@@ -62,7 +67,7 @@ def convert_script_to_json(file_path):
         return "File not found."
 
 
-def recreate_script_from_json(data, file_path):
+def recreate_script_from_json(data, alias_file_path):
     """Recreate the script from JSON."""
     try:
         # sort the data by key then by alias
@@ -86,11 +91,11 @@ def recreate_script_from_json(data, file_path):
             script_content += "\n"
 
         # Write the script content to the file
-        with open(file_path, "w", encoding="utf-8") as file:
+        with open(alias_file_path, "w", encoding="utf-8") as file:
             file.write(script_content)
 
         # source the file
-        return f"Script successfully updated at {file_path}\nRun `source ~/.bashrc` to update the aliases."
+        return f"Script successfully updated at {alias_file_path}\nRun `source ~/.bashrc` to update the aliases."
 
     except json.JSONDecodeError:
         return "Invalid JSON format."
@@ -106,8 +111,7 @@ def list_commands(
     ] = "all"
 ):
     """List all commands or commands filtered by group."""
-    file_path = "/home/vaadeendra/scripts/aliases/aliases.sh"
-    output_json = convert_script_to_json(file_path)
+    output_json = convert_script_to_json(alias_file_path)
     if group == "all":
         # print the entire json as table with colours
         table = Table(title="Aliases")
@@ -146,8 +150,7 @@ def add_command(
     ] = "main",
 ):
     """Add a command to the aliases."""
-    file_path = "/home/vaadeendra/scripts/aliases/aliases.sh"
-    output_json = convert_script_to_json(file_path)
+    output_json = convert_script_to_json(alias_file_path)
 
     # check if the group and alias already exists
     for alias_dict in output_json.get(group, []):
@@ -161,7 +164,7 @@ def add_command(
 
     # add the alias to the json
     output_json[group].append({"alias": alias, "command": command})
-    output = recreate_script_from_json(output_json, file_path)
+    output = recreate_script_from_json(output_json, alias_file_path)
     console.print(output)
 
 
@@ -177,14 +180,13 @@ def remove_command(
     ] = "main",
 ):
     """Remove a command from the aliases."""
-    file_path = "/home/vaadeendra/scripts/aliases/aliases.sh"
-    output_json = convert_script_to_json(file_path)
+    output_json = convert_script_to_json(alias_file_path)
 
     # check if the group and alias already exists
     for alias_dict in output_json.get(group, []):
         if alias_dict["alias"] == alias:
             output_json[group].remove(alias_dict)
-            output = recreate_script_from_json(output_json, file_path)
+            output = recreate_script_from_json(output_json, alias_file_path)
             console.print(output)
             sys.exit(0)
 
@@ -208,14 +210,13 @@ def update_command(
     ] = "main",
 ):
     """Update a command from the aliases."""
-    file_path = "/home/vaadeendra/scripts/aliases/aliases.sh"
-    output_json = convert_script_to_json(file_path)
+    output_json = convert_script_to_json(alias_file_path)
 
     # check if the group and alias already exists
     for alias_dict in output_json.get(group, []):
         if alias_dict["alias"] == alias:
             alias_dict["command"] = command
-            output = recreate_script_from_json(output_json, file_path)
+            output = recreate_script_from_json(output_json, alias_file_path)
             console.print(output)
             sys.exit(0)
 
@@ -235,8 +236,7 @@ def search_command(
     ] = "all",
 ):
     """Search a command from the aliases."""
-    file_path = "/home/vaadeendra/scripts/aliases/aliases.sh"
-    output_json = convert_script_to_json(file_path)
+    output_json = convert_script_to_json(alias_file_path)
 
     # check if the alias already exists and if the group is all search in all groups
     for group_name, alias_list in output_json.items():
@@ -260,8 +260,7 @@ def search_command(
 @edit_commands.command(name="script")
 def script_command():
     """Edit  the aliases script using nano."""
-    file_path = "/home/vaadeendra/scripts/aliases/aliases.sh"
-    subprocess.run(["nano", file_path], check=True)
+    subprocess.run(["nano", alias_file_path], check=True)
     console.print(
         "Script updated successfully. Run `source ~/.bashrc` to update the aliases."
     )
