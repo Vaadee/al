@@ -122,4 +122,4 @@ uv run ruff check .
 
 ## License
 
-[MIT](LICENSE)
+[GPLv3](LICENSE)
