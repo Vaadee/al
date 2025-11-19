@@ -2,29 +2,49 @@
 name = "al"
 version = "0.1.0"
 description = "A streamlined CLI tool for managing aliases on Linux systems, simplifying the creation, deletion, and management of command shortcuts."
-license = { file = "LICENSE" }
 readme = "README.md"
+requires-python = ">=3.11"
 authors = [
     { name = "Vaadeendra", email = "42719383+Vaadee@users.noreply.github.com" }
 ]
-requires-python = ">=3.11"
-dependencies = ["pydantic (>=2.11.3,<3.0.0)", "typer (>=0.15.2,<0.16.0)"]
+license = { file = "LICENSE" }
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "questionary>=2.0.0",
+    "requests>=2.31.0",
+]
 
 [project.scripts]
-al = "al:app"
+al = "al.main:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.11.5",
+]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[dependency-groups]
-dev = [
-    "pytest>=8.3.5",
-    "ruff>=0.11.5",
-]
+[tool.hatch.build.targets.wheel]
+packages = ["al"]
 
 [tool.ruff.lint]
 # On top of the defaults (`E4`, E7`, `E9`, and `F`), enable flake8-bugbear (`B`) and flake8-quotes (`Q`).
 select = ["ALL"]
-ignore = ["S603"]
+ignore = [
+    "S603", "B008", "S602",  # Shell/Typer specific
+    "C901", "PLR0912",       # Complexity
+    "FBT001",                # Boolean args (Typer flags)
+    "A001",                  # Shadowing (help command)
+    "SLF001",                # Private access
+    "BLE001",                # Blind exception (network)
+    "ERA001",                # Commented code
+    "PLR2004",               # Magic values
+    "TRY300",                # Try/Else
+]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S108"]
