@@ -43,6 +43,7 @@ def test_add_interactive(mock_config: Path) -> None:
     with (
         patch("questionary.select") as mock_select,
         patch("questionary.text") as mock_text,
+        patch("al.main.is_initialized", return_value=True),
     ):
         mock_select.return_value.ask.return_value = "main"
         mock_text.return_value.ask.side_effect = ["foo", "echo bar"]
@@ -58,30 +59,38 @@ def test_add_interactive(mock_config: Path) -> None:
 def test_view(mock_config: Path) -> None:
     """Test viewing aliases."""
     mock_config.write_text('#[main]\nalias foo="echo bar"')
-    result = runner.invoke(app, ["view"])
-    assert result.exit_code == 0
-    assert "foo" in result.stdout
-    assert "echo bar" in result.stdout
+    with patch("al.main.is_initialized", return_value=True):
+        result = runner.invoke(app, ["view"])
+        assert result.exit_code == 0
+        assert "foo" in result.stdout
+        assert "echo bar" in result.stdout
 
 
 def test_search(mock_config: Path) -> None:
     """Test searching aliases."""
     mock_config.write_text('#[main]\nalias foo="echo bar"')
-    result = runner.invoke(app, ["search", "foo"])
-    assert result.exit_code == 0
-    assert "foo" in result.stdout
+    with patch("al.main.is_initialized", return_value=True):
+        result = runner.invoke(app, ["search", "foo"])
+        assert result.exit_code == 0
+        assert "foo" in result.stdout
 
 
 def test_remove(mock_config: Path) -> None:
     """Test removing an alias."""
     mock_config.write_text('#[main]\nalias foo="echo bar"')
 
-    with patch("questionary.select") as mock_select:
-        mock_select.return_value.ask.return_value = "[main] foo -> echo bar"
+    # We need to mock is_initialized to True for remove to work
+    with patch("al.main.is_initialized", return_value=True):
+        with (
+            patch("questionary.checkbox") as mock_checkbox,
+            patch("questionary.confirm") as mock_confirm,
+        ):
+            mock_checkbox.return_value.ask.return_value = ["[main] foo -> echo bar"]
+            mock_confirm.return_value.ask.return_value = True
 
-        result = runner.invoke(app, ["remove"])
-        assert result.exit_code == 0
-        assert "Alias removed" in result.stdout
+            result = runner.invoke(app, ["remove"])
+            assert result.exit_code == 0
+            assert "Removed 1 aliases" in result.stdout
 
-        content = mock_config.read_text()
-        assert "foo" not in content
+            content = mock_config.read_text()
+            assert "foo" not in content

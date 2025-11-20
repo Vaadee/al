@@ -12,8 +12,9 @@ from rich.syntax import Syntax
 from rich.table import Table
 
 from al.core.config import config
+from al.core.constants import RESERVED_ALIASES
 from al.core.parser import Alias, parse_aliases, serialize_aliases
-from al.core.shell import ensure_shell_source
+from al.core.shell import ensure_shell_source, is_initialized
 from al.core.sync import GistSync
 
 app = typer.Typer(help="al - Alias Manager", no_args_is_help=True)
@@ -39,12 +40,60 @@ def common(
     ),
 ) -> None:
     """Entry point for all commands."""
+    if ctx.invoked_subcommand in ["init", "help", "check", None]:
+        return
+
+    # Check if initialized
+    if not is_initialized():
+        console.print(
+            "[red]al is not initialized. Please run 'al init' first.[/red]",
+        )
+        raise typer.Exit(code=1)
 
 
 @app.command()
 def help(ctx: typer.Context) -> None:
     """Show this message and exit."""
     console.print(ctx.parent.get_help())
+
+
+@app.command()
+def check() -> None:
+    """Check the health of the al installation."""
+    table = Table(title="System Check")
+    table.add_column("Component", style="cyan")
+    table.add_column("Status", style="green")
+    table.add_column("Details")
+
+    # 1. Config Directory
+    if config.config_dir.exists():
+        table.add_row("Config Directory", "✅", str(config.config_dir))
+    else:
+        table.add_row("Config Directory", "❌", "Not found")
+
+    # 2. Alias File
+    if config.alias_file.exists():
+        table.add_row("Alias File", "✅", str(config.alias_file))
+    else:
+        table.add_row("Alias File", "❌", "Not found")
+
+    # 3. Shell RC
+    rc_file = config.shell_rc
+    if rc_file:
+        if rc_file.exists():
+            table.add_row("Shell Configuration", "✅", str(rc_file))
+        else:
+            table.add_row("Shell Configuration", "❌", f"File not found: {rc_file}")
+    else:
+        table.add_row("Shell Configuration", "❌", "Could not detect shell")
+
+    # 4. Initialization
+    if is_initialized():
+        table.add_row("Initialization", "✅", "Sourced in shell rc")
+    else:
+        table.add_row("Initialization", "❌", "Not sourced")
+
+    console.print(table)
 
 
 @app.command()
@@ -99,6 +148,10 @@ def add() -> None:
     name = questionary.text("Alias name:").ask()
     if not name:
         console.print("[red]Alias name cannot be empty[/red]")
+        return
+
+    if name in RESERVED_ALIASES:
+        console.print(f"[red]Alias name '{name}' is reserved.[/red]")
         return
 
     command = questionary.text("Command:").ask()
@@ -395,7 +448,7 @@ def edit() -> None:
 
 @app.command()
 def remove() -> None:
-    """Interactively remove an alias."""
+    """Interactively remove aliases."""
     if not config.alias_file.exists():
         console.print("[yellow]No aliases found.[/yellow]")
         return
@@ -405,45 +458,53 @@ def remove() -> None:
 
     # Flatten for selection
     choices = []
+    alias_map = {}
     for g_name, aliases in groups.items():
-        choices.extend(
-            f"[{g_name}] {alias.name} -> {alias.command}" for alias in aliases
-        )
+        for alias in aliases:
+            choice_str = f"[{g_name}] {alias.name} -> {alias.command}"
+            choices.append(choice_str)
+            alias_map[choice_str] = (g_name, alias)
 
     if not choices:
         console.print("[yellow]No aliases to remove.[/yellow]")
         return
 
-    selected = questionary.select(
-        "Select alias to remove:",
+    selected = questionary.checkbox(
+        "Select aliases to remove:",
         choices=choices,
     ).ask()
 
     if not selected:
         return
 
-    # Parse selection back to find alias
-    # Format: "[group] name -> command"
-    # This is a bit loose, better to store a map
+    # Show confirmation table
+    table = Table(title="Aliases to Remove")
+    table.add_column("Group", style="cyan")
+    table.add_column("Name", style="green")
+    table.add_column("Command")
 
-    # Re-find based on selection string
-    found = False
-    for g_name, aliases in groups.items():
-        for alias in aliases:
-            s = f"[{g_name}] {alias.name} -> {alias.command}"
-            if s == selected:
-                aliases.remove(alias)
-                found = True
-                break
-        if found:
-            break
+    to_remove = []
+    for s in selected:
+        g_name, alias = alias_map[s]
+        to_remove.append((g_name, alias))
+        table.add_row(g_name, alias.name, alias.command)
 
-    if found:
-        new_content = serialize_aliases(groups)
-        config.alias_file.write_text(new_content)
-        console.print("[green]Alias removed.[/green]")
-    else:
-        console.print("[red]Error finding alias to remove.[/red]")
+    console.print(table)
+
+    if not questionary.confirm(
+        f"Are you sure you want to remove these {len(to_remove)} aliases?",
+    ).ask():
+        console.print("[yellow]Operation cancelled.[/yellow]")
+        return
+
+    # Remove
+    for g_name, alias in to_remove:
+        if alias in groups[g_name]:
+            groups[g_name].remove(alias)
+
+    new_content = serialize_aliases(groups)
+    config.alias_file.write_text(new_content)
+    console.print(f"[green]Removed {len(to_remove)} aliases.[/green]")
 
 
 if __name__ == "__main__":
