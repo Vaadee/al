@@ -30,6 +30,14 @@ uv sync
 uv pip install -e .
 ```
 
+### Install from PyPI
+
+```bash
+pip install al-alias-manager
+# or
+uv pip install al-alias-manager
+```
+
 ## Quick Start
 
 1.  **Initialize**: Set up the configuration and shell integration.
