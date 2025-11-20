@@ -1,5 +1,5 @@
 [project]
-name = "al"
+name = "al-alias-manager"
 version = "0.1.0"
 description = "A streamlined CLI tool for managing aliases on Linux systems, simplifying the creation, deletion, and management of command shortcuts."
 readme = "README.md"
