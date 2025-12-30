@@ -25,7 +25,8 @@ class Config:
             self.alias_file.touch()
 
     def load_sync_config(self) -> dict:
-        """Load synchronization configuration from JSON file.
+        """
+        Load synchronization configuration from JSON file.
 
         Returns:
             dict: The configuration data.
@@ -36,7 +37,8 @@ class Config:
         return {}
 
     def save_sync_config(self, data: dict) -> None:
-        """Save synchronization configuration to JSON file.
+        """
+        Save synchronization configuration to JSON file.
 
         Args:
             data (dict): The configuration data to save.
@@ -46,7 +48,8 @@ class Config:
 
     @property
     def shell_rc(self) -> Path | None:
-        """Get the path to the shell configuration file.
+        """
+        Get the path to the shell configuration file.
 
         Returns:
             Path | None: Path to .zshrc or .bashrc, or None if not detected.

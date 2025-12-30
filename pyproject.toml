@@ -20,8 +20,10 @@ al = "al.main:app"
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.5.1",
     "pytest>=7.0.0",
     "ruff>=0.11.5",
+    "ty>=0.0.8",
 ]
 
 [build-system]
@@ -44,6 +46,8 @@ ignore = [
     "ERA001",                # Commented code
     "PLR2004",               # Magic values
     "TRY300",                # Try/Else
+    "D203", "D212",          # Docstring
+    "COM812",                # Comments
 ]
 
 [tool.ruff.lint.per-file-ignores]

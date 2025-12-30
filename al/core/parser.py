@@ -14,7 +14,8 @@ class Alias:
 
 
 def parse_aliases(content: str) -> dict[str, list[Alias]]:
-    """Parse alias file content into groups.
+    """
+    Parse alias file content into groups.
 
     Format:
     #[group_name]
@@ -64,7 +65,8 @@ def parse_aliases(content: str) -> dict[str, list[Alias]]:
 
 
 def serialize_aliases(groups: dict[str, list[Alias]]) -> str:
-    """Serialize groups back to string format.
+    """
+    Serialize groups back to string format.
 
     Args:
         groups (dict[str, list[Alias]]): The groups of aliases to serialize.

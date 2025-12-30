@@ -4,7 +4,8 @@ from .config import config
 
 
 def ensure_shell_source() -> tuple[bool, str]:
-    """Ensure the alias file is sourced in the shell rc file.
+    """
+    Ensure the alias file is sourced in the shell rc file.
 
     Returns:
         tuple[bool, str]: A tuple containing success status and a message.
@@ -30,7 +31,8 @@ def ensure_shell_source() -> tuple[bool, str]:
 
 
 def is_initialized() -> bool:
-    """Check if al is initialized (sourced in shell rc).
+    """
+    Check if al is initialized (sourced in shell rc).
 
     Returns:
         bool: True if initialized, False otherwise.

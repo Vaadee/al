@@ -31,7 +31,7 @@ def version_callback(value: bool) -> None:
 @app.callback()
 def common(
     ctx: typer.Context,
-    version: bool = typer.Option(
+    version: bool = typer.Option(  # noqa: ARG001
         None,
         "--version",
         "-v",
@@ -54,7 +54,8 @@ def common(
 @app.command()
 def help(ctx: typer.Context) -> None:
     """Show this message and exit."""
-    console.print(ctx.parent.get_help())
+    if ctx.parent:
+        console.print(ctx.parent.get_help())
 
 
 @app.command()
@@ -98,7 +99,8 @@ def check() -> None:
 
 @app.command()
 def init() -> None:
-    """Initialize al: create config and add source to shell rc.
+    """
+    Initialize al: create config and add source to shell rc.
 
     Examples:
         $ al init
@@ -118,7 +120,8 @@ def init() -> None:
 
 @app.command()
 def add() -> None:
-    """Interactively add a new alias.
+    """
+    Interactively add a new alias.
 
     Examples:
         $ al add
@@ -184,7 +187,8 @@ def add() -> None:
 
 @app.command()
 def view(group: str | None = typer.Argument(None, help="Filter by group name")) -> None:
-    """List all aliases, optionally filtered by group.
+    """
+    List all aliases, optionally filtered by group.
 
     Examples:
         $ al view
@@ -218,7 +222,8 @@ def view(group: str | None = typer.Argument(None, help="Filter by group name")) 
 def list_aliases(
     group: str | None = typer.Argument(None, help="Filter by group name"),
 ) -> None:
-    """Alias for 'view'.
+    """
+    Alias for 'view'.
 
     Examples:
         $ al list
@@ -230,7 +235,8 @@ def list_aliases(
 
 @app.command()
 def search(query: str) -> None:
-    """Search aliases by name or command.
+    """
+    Search aliases by name or command.
 
     Examples:
         $ al search docker
@@ -268,7 +274,8 @@ def search(query: str) -> None:
 
 @app.command()
 def run(name: str) -> None:
-    """Run an alias by name.
+    """
+    Run an alias by name.
 
     Examples:
         $ al run my-alias
@@ -306,7 +313,8 @@ def import_aliases(
         help="Path to file to import from (e.g. .zshrc)",
     ),
 ) -> None:
-    """Import aliases from a file (e.g. .zshrc, .bash_aliases).
+    """
+    Import aliases from a file (e.g. .zshrc, .bash_aliases).
 
     Examples:
         $ al import ~/.zshrc
@@ -368,7 +376,8 @@ def import_aliases(
 
 @app.command()
 def sync(action: str = typer.Argument(..., help="Action: 'push' or 'pull'")) -> None:
-    """Sync aliases with GitHub Gist.
+    """
+    Sync aliases with GitHub Gist.
 
     Examples:
         $ al sync push

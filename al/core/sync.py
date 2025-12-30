@@ -9,7 +9,8 @@ class GistSync:
     """Handles synchronization with GitHub Gists."""
 
     def __init__(self, token: str) -> None:
-        """Initialize GistSync with a GitHub token.
+        """
+        Initialize GistSync with a GitHub token.
 
         Args:
             token (str): GitHub Personal Access Token.
@@ -22,7 +23,8 @@ class GistSync:
         }
 
     def push(self, content: str, gist_id: str | None = None) -> tuple[bool, str]:
-        """Push content to a Gist.
+        """
+        Push content to a Gist.
 
         If gist_id is provided, update it. Otherwise create new.
 
@@ -66,7 +68,8 @@ class GistSync:
             return False, str(e)
 
     def pull(self, gist_id: str) -> tuple[bool, str]:
-        """Pull content from a Gist.
+        """
+        Pull content from a Gist.
 
         Args:
             gist_id (str): The ID of the Gist to pull from.
